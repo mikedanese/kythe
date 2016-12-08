@@ -80,6 +80,7 @@ func (o *Options) diskSorter(l sortutil.Lesser, m disksort.Marshaler) (disksort.
 		MaxInMemory:    o.MaxShardSize,
 		CompressShards: o.CompressShards,
 		IOBufferSize:   o.IOBufferSize,
+		WorkDir:        "./scratch",
 	})
 }
 

@@ -90,6 +90,10 @@ type PackageInfo struct {
 // Import satisfies the types.Importer interface using the captured data from
 // the compilation unit.
 func (pi *PackageInfo) Import(importPath string) (*types.Package, error) {
+	//fmt.Printf("i: %v\n", importPath)
+	//for k, _ := range pi.Dependencies {
+	//	fmt.Printf("d: %v\n", k)
+	//}
 	if pkg := pi.Dependencies[importPath]; pkg != nil {
 		return pkg, nil
 	}
@@ -337,7 +341,8 @@ func (pi *PackageInfo) newSignature(obj types.Object) (tag, base string) {
 				_, base := pi.newSignature(owner)
 				return tagMethod, base + "." + t.Name()
 			}
-			return tagMethod, fmt.Sprintf("(%s).%s", recv.Type(), t.Name())
+			foo := recv.Type().String()
+			return tagMethod, fmt.Sprintf("(%s).%s", foo[strings.LastIndex(foo, "/")+1:len(foo)], t.Name())
 		}
 
 	case *types.TypeName:
@@ -485,11 +490,19 @@ func AllTypeInfo() *types.Info {
 	}
 }
 
+var (
+	r1 = regexp.MustCompile("(.*/)?vendor/")
+	r2 = regexp.MustCompile("^io_k8s_kubernetes/")
+	r3 = regexp.MustCompile("(.*/)?go_default_library.a.dir/")
+	r4 = regexp.MustCompile("/[^/]*\\.go$")
+)
+
 func normalize(ipath string) string {
 	//log.Printf("in: %v", ipath)
-	ipath = regexp.MustCompile("(.*/)?vendor/").ReplaceAllString(ipath, "")
-	ipath = regexp.MustCompile("(.*/)?go_default_library.a.dir/").ReplaceAllString(ipath, "")
-	ipath = regexp.MustCompile("/[^/]*\\.go$").ReplaceAllString(ipath, "")
+	ipath = r1.ReplaceAllString(ipath, "")
+	ipath = r2.ReplaceAllString(ipath, "k8s.io/kubernetes/")
+	ipath = r3.ReplaceAllString(ipath, "")
+	ipath = r4.ReplaceAllString(ipath, "")
 	ipath = strings.TrimPrefix(ipath, "golang.org/pkg/linux_amd64/")
 	ipath = strings.TrimSuffix(ipath, "/go_default_library.a")
 	ipath = strings.TrimSuffix(ipath, ".a")

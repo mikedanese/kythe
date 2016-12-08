@@ -125,7 +125,7 @@ func (w *worker) run(ctx context.Context, wg *sync.WaitGroup) {
 					VName: &spb.VName{
 						Signature: pkg.Signature(obj),
 						Path:      obj.Imported().Path(),
-						Corpus:    "k8s.io/kubernetes",
+						Corpus:    "io_k8s_kubernetes",
 					},
 					Kind: nodes.Record,
 				}
@@ -220,7 +220,7 @@ func (w *worker) run(ctx context.Context, wg *sync.WaitGroup) {
 				vname := &spb.VName{
 					Signature: pkg.Signature(obj),
 					Path:      obj.Imported().Path(),
-					Corpus:    "k8s.io/kubernetes",
+					Corpus:    "io_k8s_kubernetes",
 				}
 				a, childOf = newAnchor(i, pkg.Signature(o)+"#use-"+strconv.Itoa(int(i.Pos())), pkg, unit)
 				a.VName = vname

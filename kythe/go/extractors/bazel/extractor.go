@@ -80,6 +80,7 @@ func (c *Config) Extract(ctx context.Context, info *eapb.ExtraActionInfo) (*kind
 
 	if len(toolArgs.sources) != 0 {
 		if vname, ok := c.Rules.Apply(strings.TrimPrefix(toolArgs.sources[0], "k8s.io/kubernetes/")); ok {
+			fmt.Println(vname.Corpus)
 			c.Corpus = vname.Corpus
 		}
 	}
