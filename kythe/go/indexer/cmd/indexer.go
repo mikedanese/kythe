@@ -37,7 +37,7 @@ func main() {
 	}
 
 	work := make(chan *apb.CompilationUnit)
-	out := make(chan *spb.Entry, 1000)
+	out := make(chan *spb.Entry)
 
 	worker := &worker{
 		pack: pack,
@@ -57,18 +57,15 @@ func main() {
 	}
 	w := delimited.NewWriter(ifile)
 
-	wg.Add(1)
 	go func() {
 		defer wg.Done()
 		for {
 
-			select {
-			case e, ok := <-out:
-				if !ok {
-					return
-				}
-				w.PutProto(e)
+			e, ok := <-out
+			if !ok {
+				return
 			}
+			w.PutProto(e)
 		}
 	}()
 
@@ -97,7 +94,10 @@ type worker struct {
 }
 
 func (w *worker) run(ctx context.Context, wg *sync.WaitGroup) {
-	defer wg.Done()
+	defer func() {
+		wg.Done()
+		fmt.Println("worker quit")
+	}()
 	for {
 		unit, ok := <-w.work
 		if !ok {
